@@ -1,0 +1,39 @@
+{
+  "name": "jira-transition-request-change",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@actions/core": "^1.2.3",
+    "@actions/exec": "^1.0.3",
+    "@actions/github": "^2.1.1",
+    "@octokit/webhooks": "^7.1.0",
+    "@types/node": "^13.9.0",
+    "@types/node-fetch": "^2.5.5",
+    "@types/yaml": "^1.2.0",
+    "node-fetch": "^2.6.0",
+    "yaml": "^1.7.2"
+  },
+  "devDependencies": {
+    "@zeit/ncc": "^0.21.1",
+    "dotenv": "^8.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "ncc build --watch --minify src/index.ts",
+    "build": "ncc build --minify src/index.ts",
+    "run": "ncc run src/index.ts",
+    "playground": "ncc run src/playground/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tuanddd/jira-transition-request-change.git"
+  },
+  "keywords": [],
+  "author": "Dao Tuan <heryhudson@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tuanddd/jira-transition-request-change/issues"
+  },
+  "homepage": "https://github.com/tuanddd/jira-transition-request-change#readme"
+}

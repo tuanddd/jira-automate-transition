@@ -1,0 +1,32 @@
+name: Jira action to automate tickets transition
+author: Tuan Dao (heryhudson@gmail.com)
+descripition: "This action can move Jira issue to col of choice by event (e.g: move to IN REVIEW col when author requests review, move to IN PROGRESS if reviewer requests changes, move to QA if pr is merged)"
+
+branding:
+  icon: repeat
+  color: blue
+
+runs:
+  using: "node12"
+  main: "./dist/index.js"
+inputs:
+  github-token:
+    required: true
+  column-to-move-to-when-review-requested:
+    description: case-sensitive
+    required: true
+  column-to-move-to-when-changes-requested:
+    description: case-sensitive
+    required: true
+  column-to-move-to-when-merged:
+    description: case-sensitive
+    required: false
+  jira-endpoint:
+    required: false
+  jira-account:
+    required: false
+  jira-token:
+    required: false
+  jira-issue-id:
+    required: false
+    description: e.g FOO-372
