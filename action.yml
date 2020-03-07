@@ -1,4 +1,4 @@
-name: Jira action to automate tickets transition
+name: Jira action to change tickets status
 author: Tuan Dao (heryhudson@gmail.com)
 description: This action can update Jira issue status by event
 
