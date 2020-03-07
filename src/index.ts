@@ -2,6 +2,7 @@ import * as core from "@actions/core";
 import { getArgs } from "./get-args";
 import { ParsedInput } from "./interfaces";
 import * as github from "@actions/github";
+import { Github } from "./github";
 import {
   handleReviewRequested,
   handleChangesRequested,
@@ -14,6 +15,7 @@ async function run() {
     const parsedInput = getArgs() as ParsedInput;
     const context = github.context;
     const {
+      repo: { owner, repo },
       payload: { action },
       eventName
     } = context;
@@ -23,10 +25,22 @@ async function run() {
       );
       handleReviewRequested(parsedInput);
     } else if (eventName === "pull_request_review" && action === "submitted") {
-      core.info(
-        `Changing issue ${parsedInput.jiraIssueId} to ${parsedInput.columnToMoveToWhenChangesRequested}`
-      );
-      handleChangesRequested(parsedInput);
+      const {
+        pull_request: { number },
+        review: { id }
+      } = context.payload as Webhooks.WebhookPayloadPullRequestReview;
+      const { githubToken } = parsedInput;
+      const githubWrapper = new Github(githubToken, owner, repo);
+      const isRequestChange = await githubWrapper.checkReviewIsRequestChange({
+        pull_number: number,
+        review_id: id
+      });
+      if (isRequestChange) {
+        core.info(
+          `Changing issue ${parsedInput.jiraIssueId} to ${parsedInput.columnToMoveToWhenChangesRequested}`
+        );
+        handleChangesRequested(parsedInput);
+      }
     } else if (eventName === "pull_request" && action === "closed") {
       const {
         merged
