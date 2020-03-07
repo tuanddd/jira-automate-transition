@@ -1,6 +1,6 @@
 name: Jira action to automate tickets transition
 author: Tuan Dao (heryhudson@gmail.com)
-descripition: "This action can update Jira issue status by event (e.g: change to IN REVIEW when author requests review, change to IN PROGRESS if reviewer requests changes, change to QA if pr is merged)"
+description: This action can update Jira issue status by event
 
 branding:
   icon: repeat
