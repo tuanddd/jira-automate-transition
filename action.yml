@@ -1,4 +1,4 @@
-name: Jira action to change tickets status
+name: Jira Ticket Transitioner
 author: Tuan Dao (heryhudson@gmail.com)
 description: This action can update Jira issue status by event
 
