@@ -1,8 +1,7 @@
 {
-  "name": "jira-transition-request-change",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "jira-automatee-transition",
+  "version": "1.0.5",
+  "description": "Github Action to automate Jira ticket transition",
   "dependencies": {
     "@actions/core": "^1.2.3",
     "@actions/exec": "^1.0.3",

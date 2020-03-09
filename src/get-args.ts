@@ -1,11 +1,11 @@
 import * as core from "@actions/core";
 import { parse } from "yaml";
 import { readFileSync } from "fs";
-import { ParsedInput, JiraConfig, JiraConfigFile } from "./interfaces";
+import { ParsedResult, JiraConfig, JiraConfigFile } from "./interfaces";
 
 const configPath = `${process.env.HOME}/jira/config.yml`;
 
-const getArgs: () => ParsedInput | void = () => {
+const getArgs: () => ParsedResult | void = () => {
   let jiraConfig: Partial<JiraConfig> = {};
   jiraConfig.jiraIssueId = core.getInput("jira-issue-id");
   try {
@@ -14,6 +14,15 @@ const getArgs: () => ParsedInput | void = () => {
     jiraConfig.jiraToken = core.getInput("jira-token");
 
     const { jiraAccount, jiraEndpoint, jiraIssueId, jiraToken } = jiraConfig;
+
+    if (!jiraIssueId || jiraIssueId === "") {
+      return {
+        exit: true,
+        success: false,
+        message: "Jira issue id not found, exiting...",
+        parsedInput: undefined
+      };
+    }
 
     Array.from([jiraAccount, jiraEndpoint, jiraIssueId, jiraToken]).forEach(
       value => {
@@ -49,19 +58,23 @@ const getArgs: () => ParsedInput | void = () => {
   const jiraIssueNumber = Number(jiraIssueId!.split(/-/g)[1]);
 
   return {
-    githubToken,
-    columnToMoveToWhenChangesRequested: colChangesRequested,
-    columnToMoveToWhenReviewRequested: colReviewRequested,
-    columnToMoveToWhenMerged: colMerged,
-    jiraAccount,
-    jiraEndpoint,
-    jiraIssueId,
-    jiraToken,
-    jiraProject,
-    jiraIssueNumber,
-    jiraTokenEncoded: Buffer.from(`${jiraAccount}:${jiraToken}`).toString(
-      "base64"
-    )
+    success: true,
+    exit: false,
+    parsedInput: {
+      githubToken,
+      columnToMoveToWhenChangesRequested: colChangesRequested,
+      columnToMoveToWhenReviewRequested: colReviewRequested,
+      columnToMoveToWhenMerged: colMerged,
+      jiraAccount,
+      jiraEndpoint,
+      jiraIssueId,
+      jiraToken,
+      jiraProject,
+      jiraIssueNumber,
+      jiraTokenEncoded: Buffer.from(`${jiraAccount}:${jiraToken}`).toString(
+        "base64"
+      )
+    }
   };
 };
 

@@ -26,6 +26,12 @@ export interface JiraConfigFile {
 
 type Params = _Params & JiraConfig;
 export type ParsedInput = Params & AdditionalJiraConfig;
+export interface ParsedResult {
+  success: boolean;
+  exit: boolean;
+  message?: string;
+  parsedInput?: ParsedInput | null;
+}
 type HandlerParams = Pick<
   ParsedInput,
   "jiraTokenEncoded" | "jiraEndpoint" | "jiraIssueId"

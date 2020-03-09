@@ -1,4 +1,4 @@
-# jira-automate-transition
+# Jira Ticket Transioner
 
 This action can move Jira issue to col of choice by event (e.g: move to IN REVIEW col when author requests review, move to IN PROGRESS if reviewer requests changes, move to QA if pr is merged).
 
@@ -22,13 +22,13 @@ This action can move Jira issue to col of choice by event (e.g: move to IN REVIE
   - Case-sensitive, status of an issue
   - If issue can not be moved or the status is not found or not provided, simply do nothing
 - `jira-endpoint`:
-  - _Optional_
+  - _Optional_ (**required** when not using [`@atlassian/gajira-login`](https://github.com/atlassian/gajira-login))
   - See [Jira Rest API docs](https://developer.atlassian.com/cloud/jira/platform/rest/v3/#version)
 - `jira-account`:
-  - _Optional_
+  - _Optional_ (**required** when not using [`@atlassian/gajira-login`](https://github.com/atlassian/gajira-login))
   - See [Using Jira API with Basic header scheme](https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/)
 - `jira-token`:
-  - _Optional_
+  - _Optional_ (**required** when not using [`@atlassian/gajira-login`](https://github.com/atlassian/gajira-login))
   - See [Using Jira API with Basic header scheme](https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/)
 - `jira-issue-id`:
   - _Optional_
@@ -37,12 +37,16 @@ This action can move Jira issue to col of choice by event (e.g: move to IN REVIE
 
 # Important
 
-Although all `jira-*` inputs are optional, they must be provided explicitly unless you are using [`@atlassian/gajira-login`](https://github.com/atlassian/gajira-login)
+Although all `jira-*` (except for `jira-issue-id`) inputs are optional, they must be provided explicitly unless you are using [`@atlassian/gajira-login`](https://github.com/atlassian/gajira-login).
+
+[`@atlassian/gajira-login`](https://github.com/atlassian/gajira-login) is an action that will write jira config data to a temporary file during the workflow so that other action can extract from it rather than having to input data.
+
+Starting from `v1.0.5`, the `jira-isssue-id` input will be optional due to the reason that some PRs are considered small enough and won't be linked to any Jira issue, therefore, it makes sense to exit safely without failing the workflow.
 
 # Example
 
 ```yml
-# Use this and you won't have to provide jira-* down there
+# Use this and you won't have to provide `[jira-endpoint, jira-account, jira-token]` down there
 - uses: atlassian/gajira-login@master
   env:
     JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
@@ -51,15 +55,14 @@ Although all `jira-*` inputs are optional, they must be provided explicitly unle
 
 
   ...
-- uses: tuanddd/jira-automate-transition@v1.0.0
+- uses: aharooms/jira-automate-transition@v1.0.5-beta
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     column-to-move-to-when-review-requested: In Review
     column-to-move-to-when-changes-requested: In Progress
     column-to-move-to-when-merged: QA
-    # Below is optional if use `atlassian/gajira-login`
-    jira-endpoint: https://...
-    jira-account: example@mail.com
-    jira-token: ******
+    jira-endpoint: https://...        # 3 inputs here are not required
+    jira-account: example@mail.com    # if you use the action mentioned
+    jira-token: ******                # above
     jira-issue-id: FOO-312
 ```
