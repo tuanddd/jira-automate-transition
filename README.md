@@ -55,7 +55,7 @@ Starting from `v1.0.5`, the `jira-isssue-id` input will be optional due to the r
 
 
   ...
-- uses: aharooms/jira-automate-transition@v1.0.5-beta
+- uses: tuanddd/jira-automate-transition@v1.0.5
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     column-to-move-to-when-review-requested: In Review
