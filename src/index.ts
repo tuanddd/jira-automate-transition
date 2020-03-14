@@ -3,11 +3,7 @@ import { getArgs } from "./get-args";
 import { ParsedResult } from "./interfaces";
 import * as github from "@actions/github";
 import { Github } from "./github";
-import {
-  handleReviewRequested,
-  handleChangesRequested,
-  handlePullRequestMerged
-} from "./handlers";
+import { handleTransitionIssue } from "./handlers";
 import * as Webhooks from "@octokit/webhooks";
 
 async function run() {
@@ -15,6 +11,8 @@ async function run() {
     const { parsedInput, success, exit, message } = getArgs() as ParsedResult;
     if (!parsedInput && !success && exit && message) {
       core.warning(message);
+    } else if (!parsedInput) {
+      throw new Error("Error trying to parse input.");
     } else {
       const context = github.context;
       const {
@@ -24,11 +22,12 @@ async function run() {
       } = context;
       if (eventName === "pull_request" && action === "review_requested") {
         core.info(
-          `Changing issue ${parsedInput!.jiraIssueId} to ${
-            parsedInput!.columnToMoveToWhenReviewRequested
-          }`
+          `Changing issue ${parsedInput.jiraIssueId} to ${parsedInput.columnToMoveToWhenReviewRequested}`
         );
-        handleReviewRequested(parsedInput!);
+        await handleTransitionIssue({
+          ...parsedInput,
+          colName: parsedInput.columnToMoveToWhenReviewRequested
+        });
       } else if (
         eventName === "pull_request_review" &&
         action === "submitted"
@@ -37,7 +36,7 @@ async function run() {
           pull_request: { number },
           review: { id }
         } = context.payload as Webhooks.WebhookPayloadPullRequestReview;
-        const { githubToken } = parsedInput!;
+        const { githubToken } = parsedInput;
         const githubWrapper = new Github(githubToken, owner, repo);
         const isRequestChange = await githubWrapper.checkReviewIsRequestChange({
           pull_number: number,
@@ -45,23 +44,25 @@ async function run() {
         });
         if (isRequestChange) {
           core.info(
-            `Changing issue ${parsedInput!.jiraIssueId} to ${
-              parsedInput!.columnToMoveToWhenChangesRequested
-            }`
+            `Changing issue ${parsedInput.jiraIssueId} to ${parsedInput.columnToMoveToWhenChangesRequested}`
           );
-          handleChangesRequested(parsedInput!);
+          await handleTransitionIssue({
+            ...parsedInput,
+            colName: parsedInput.columnToMoveToWhenChangesRequested
+          });
         }
       } else if (eventName === "pull_request" && action === "closed") {
         const {
           merged
         } = (context.payload as Webhooks.WebhookPayloadPullRequest).pull_request;
-        if (merged) {
+        if (merged && parsedInput.columnToMoveToWhenMerged) {
           core.info(
-            `Changing issue ${parsedInput!.jiraIssueId} to ${
-              parsedInput!.columnToMoveToWhenMerged
-            }`
+            `Changing issue ${parsedInput.jiraIssueId} to ${parsedInput.columnToMoveToWhenMerged}`
           );
-          handlePullRequestMerged(parsedInput!);
+          await handleTransitionIssue({
+            ...parsedInput,
+            colName: parsedInput.columnToMoveToWhenMerged
+          });
         }
       }
     }

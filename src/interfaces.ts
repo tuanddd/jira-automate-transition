@@ -36,9 +36,5 @@ type HandlerParams = Pick<
   ParsedInput,
   "jiraTokenEncoded" | "jiraEndpoint" | "jiraIssueId"
 >;
-export type HandleChangesRequestedParams = HandlerParams &
-  Pick<_Params, "columnToMoveToWhenChangesRequested">;
-export type HandleReviewRequestedParams = HandlerParams &
-  Pick<_Params, "columnToMoveToWhenReviewRequested">;
-export type HandleMergedParams = HandlerParams &
-  Pick<_Params, "columnToMoveToWhenMerged">;
+
+export type HandleTransitionParams = HandlerParams & { colName: string };

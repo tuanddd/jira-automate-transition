@@ -1,6 +1,7 @@
 import { config } from "dotenv";
 config();
-import { handleChangesRequested, handleReviewRequested } from "../handlers";
+import { handleTransitionIssue } from "../handlers";
+import { JiraClient } from "../jira";
 
 const {
   JIRA_API_ENDPOINT,
@@ -17,12 +18,7 @@ const jiraToken = Buffer.from(`${JIRA_ACCOUNT}:${JIRA_AUTH_TOKEN}`).toString(
 
 (async () => {
   try {
-    handleReviewRequested({
-      jiraTokenEncoded: jiraToken,
-      jiraEndpoint: JIRA_API_ENDPOINT!,
-      jiraIssueId: JIRA_ISSUE_KEY!,
-      columnToMoveToWhenReviewRequested: "Review"
-    });
+    // Your code here
   } catch (error) {
     console.error(error);
   }
