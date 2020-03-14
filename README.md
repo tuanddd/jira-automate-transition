@@ -1,4 +1,4 @@
-# Jira Ticket Transioner
+# Jira Ticket Transitioner
 
 This action can move Jira issue to col of choice by event (e.g: move to IN REVIEW col when author requests review, move to IN PROGRESS if reviewer requests changes, move to QA if pr is merged).
 
