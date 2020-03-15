@@ -15,7 +15,8 @@
   },
   "devDependencies": {
     "@zeit/ncc": "^0.21.1",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "husky": "^4.2.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,6 +24,11 @@
     "build": "ncc build --minify src/index.ts",
     "run": "ncc run src/index.ts",
     "playground": "ncc run src/playground/index.ts"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run build"
+    }
   },
   "repository": {
     "type": "git",
