@@ -13,7 +13,9 @@ const handleTransitionIssue = async ({
     `${jiraEndpoint}/rest/api/3/issue/${jiraIssueId}`
   );
   const {
-    status: { name }
+    fields: {
+      status: { name }
+    }
   } = issueDetail;
   if (name === colName) {
     warning(`
