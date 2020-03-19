@@ -17,23 +17,33 @@ async function run() {
       const context = github.context;
       const {
         repo: { owner, repo },
-        payload: { action },
+        payload,
         eventName
       } = context;
-      if (eventName === "pull_request" && action === "review_requested") {
-        core.info(
-          `Changing issue ${parsedInput.jiraIssueId} to ${parsedInput.columnToMoveToWhenReviewRequested}`
-        );
+      if (
+        eventName === "pull_request" &&
+        payload.action === "review_requested"
+      ) {
+        const {
+          pull_request: {
+            head: { ref }
+          }
+        } = payload as Webhooks.WebhookPayloadPullRequest;
+        core.info(`Branch name: ${ref}`);
         await handleTransitionIssue({
           ...parsedInput,
-          colName: parsedInput.columnToMoveToWhenReviewRequested
+          colName: parsedInput.columnToMoveToWhenReviewRequested,
+          branchName: ref
         });
       } else if (
         eventName === "pull_request_review" &&
-        action === "submitted"
+        payload.action === "submitted"
       ) {
         const {
-          pull_request: { number },
+          pull_request: {
+            number,
+            head: { ref }
+          },
           review: { id }
         } = context.payload as Webhooks.WebhookPayloadPullRequestReview;
         const { githubToken } = parsedInput;
@@ -43,25 +53,26 @@ async function run() {
           review_id: id
         });
         if (isRequestChange) {
-          core.info(
-            `Changing issue ${parsedInput.jiraIssueId} to ${parsedInput.columnToMoveToWhenChangesRequested}`
-          );
+          core.info(`Branch name: ${ref}`);
           await handleTransitionIssue({
             ...parsedInput,
-            colName: parsedInput.columnToMoveToWhenChangesRequested
+            colName: parsedInput.columnToMoveToWhenChangesRequested,
+            branchName: ref
           });
         }
-      } else if (eventName === "pull_request" && action === "closed") {
+      } else if (eventName === "pull_request" && payload.action === "closed") {
         const {
-          merged
-        } = (context.payload as Webhooks.WebhookPayloadPullRequest).pull_request;
+          pull_request: {
+            merged,
+            head: { ref }
+          }
+        } = payload as Webhooks.WebhookPayloadPullRequest;
         if (merged && parsedInput.columnToMoveToWhenMerged) {
-          core.info(
-            `Changing issue ${parsedInput.jiraIssueId} to ${parsedInput.columnToMoveToWhenMerged}`
-          );
+          core.info(`Branch name: ${ref}`);
           await handleTransitionIssue({
             ...parsedInput,
-            colName: parsedInput.columnToMoveToWhenMerged
+            colName: parsedInput.columnToMoveToWhenMerged,
+            branchName: ref
           });
         }
       }

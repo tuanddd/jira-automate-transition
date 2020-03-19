@@ -11,6 +11,9 @@ interface _Params {
   columnToMoveToWhenReviewRequested: string;
   columnToMoveToWhenChangesRequested: string;
   columnToMoveToWhenMerged?: string;
+  resolveTicketIdsFunc?: (
+    branchName: string
+  ) => Promise<string[] | string | void>;
 }
 
 interface AdditionalJiraConfig {
@@ -34,7 +37,10 @@ export interface ParsedResult {
 }
 type HandlerParams = Pick<
   ParsedInput,
-  "jiraTokenEncoded" | "jiraEndpoint" | "jiraIssueId"
+  "jiraTokenEncoded" | "jiraEndpoint" | "jiraIssueId" | "resolveTicketIdsFunc"
 >;
 
-export type HandleTransitionParams = HandlerParams & { colName: string };
+export type HandleTransitionParams = HandlerParams & {
+  colName: string;
+  branchName?: string;
+};

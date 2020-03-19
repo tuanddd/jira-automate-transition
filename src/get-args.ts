@@ -5,7 +5,16 @@ import { ParsedResult, JiraConfig, JiraConfigFile } from "./interfaces";
 
 const configPath = `${process.env.HOME}/jira/config.yml`;
 
+const AsyncFunction = Object.getPrototypeOf(async function() {}).constructor;
+
 const getArgs: () => ParsedResult | void = () => {
+  const resolveTicketIdsScript = core.getInput("resolve-ticket-ids-script");
+
+  const resolveTicketIdsFunc =
+    resolveTicketIdsScript !== ""
+      ? new AsyncFunction("branchName", resolveTicketIdsScript)
+      : undefined;
+
   let jiraConfig: Partial<JiraConfig> = {};
   jiraConfig.jiraIssueId = core.getInput("jira-issue-id");
   try {
@@ -15,20 +24,18 @@ const getArgs: () => ParsedResult | void = () => {
 
     const { jiraAccount, jiraEndpoint, jiraIssueId, jiraToken } = jiraConfig;
 
-    if (!jiraIssueId || jiraIssueId === "") {
+    if ((!jiraIssueId || jiraIssueId === "") && !resolveTicketIdsFunc) {
       return {
         exit: true,
         success: false,
-        message: "Jira issue id not found, exiting...",
+        message: "Jira issue id and ticket id resolver not found, exiting...",
         parsedInput: undefined
       };
     }
 
-    Array.from([jiraAccount, jiraEndpoint, jiraIssueId, jiraToken]).forEach(
-      value => {
-        if (value === "" || !value) throw new Error("");
-      }
-    );
+    Array.from([jiraAccount, jiraEndpoint, jiraToken]).forEach(value => {
+      if (value === "" || !value) throw new Error("");
+    });
   } catch (error) {
     console.log(`Missing input, using config file instead...`);
     const {
@@ -73,7 +80,8 @@ const getArgs: () => ParsedResult | void = () => {
       jiraIssueNumber,
       jiraTokenEncoded: Buffer.from(`${jiraAccount}:${jiraToken}`).toString(
         "base64"
-      )
+      ),
+      resolveTicketIdsFunc
     }
   };
 };
